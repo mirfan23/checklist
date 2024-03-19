@@ -32,14 +32,13 @@ class AuthService extends GetxService {
         throw Exception('Login gagal, status code: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Registrasi gagal: $e');
+      throw Exception('Login gagal: $e');
     }
   }
 
   Future<void> saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
-    print('token : $token');
   }
 
   Future<void> loadToken() async {

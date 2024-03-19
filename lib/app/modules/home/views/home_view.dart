@@ -1,3 +1,5 @@
+import 'package:checklist/app/data/models/checklist_model.dart';
+import 'package:checklist/app/data/services/checklist_service.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -10,78 +12,42 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Checklists'),
+        title: Text('Todo List'),
       ),
-      body: GetBuilder<HomeController>(builder: (controller) {
-        return ListView.builder(
-          itemCount: controller.checklists.length,
-          itemBuilder: (context, index) {
-            var checklist = controller.checklists[index];
-            return ListTile(
-              title: Text(checklist.name),
-              subtitle: Text(checklist.items.toString() ?? 'No Items'),
-              trailing: Checkbox(
-                value: checklist.checklistCompletionStatus,
-                onChanged: (value) {
-                  // Handle checkbox change
-                },
-              ),
-            );
-          },
-        );
-      }),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showCreateChecklistDialog(context);
-        },
-        child: Icon(Icons.add),
-      ),
-    );
-  }
-
-  // Function to show dialog for creating checklist
-  void showCreateChecklistDialog(BuildContext context) {
-    TextEditingController nameController = TextEditingController();
-    TextEditingController itemsController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Create Checklist'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: 'Name'),
-              ),
-              TextField(
-                controller: itemsController,
-                decoration: InputDecoration(labelText: 'Items'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                controller.createChecklist(
-                  nameController.text,
-                  itemsController.text.isEmpty ? null : itemsController.text,
+      body: FutureBuilder<List<ChecklistModel>>(
+        future: ChecklistService.getAllChecklists(
+            controller.authService.token.value),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            final todoLists = snapshot.data!;
+            return ListView.builder(
+              itemCount: todoLists.length,
+              itemBuilder: (context, index) {
+                final todoList = todoLists[index];
+                return ListTile(
+                  title: Text(todoList.name),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: todoList.items
+                        .map((item) => CheckboxListTile(
+                              title: Text(item.name),
+                              value: item.completionStatus,
+                              onChanged: (newValue) {
+                                // Implement logic to update completion status
+                              },
+                            ))
+                        .toList(),
+                  ),
                 );
-                Navigator.of(context).pop();
               },
-              child: Text('Create'),
-            ),
-          ],
-        );
-      },
+            );
+          }
+        },
+      ),
     );
   }
 }

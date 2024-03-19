@@ -25,7 +25,7 @@ class LoginController extends GetxController {
 
   Future<void> login(String username, String passwordLogin) async {
     try {
-      await authService.login(passwordLogin, username);
+      await authService.login(username, passwordLogin);
       Get.defaultDialog(
         title: 'Register Berhasil',
         onConfirm: () => Get.back(),

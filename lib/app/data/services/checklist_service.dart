@@ -1,39 +1,27 @@
+import 'dart:convert';
+
 import 'package:checklist/app/data/models/checklist_model.dart';
 import 'package:checklist/app/data/provider/checklist_provider.dart';
 import 'package:get/get.dart';
 
-class ChecklistService extends GetxService {
-  final ChecklistProvider checklistProvider = Get.put(ChecklistProvider());
-  final RxList<Checklist> checklists = <Checklist>[].obs;
-  final RxBool isLoading = true.obs;
+import 'package:http/http.dart' as http;
 
-  Future<void> getAllChecklists() async {
-    try {
-      var response = await checklistProvider.getAllChecklists();
-      if (response.statusCode == 200) {
-        var data = response.data['data'];
-        List<Checklist> fetchedChecklists =
-            data.map<Checklist>((item) => Checklist.fromJson(item)).toList();
-        checklists.assignAll(fetchedChecklists); // Perbarui checklists
-      } else {
-        print('Error C Service: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error C Service 2: $e');
-    }
-  }
+class ChecklistService {
+  static const String baseUrl = 'http://94.74.86.174:8080/api/checklist';
 
-  Future<void> createChecklist(String name, String? item) async {
-    try {
-      var response = await checklistProvider.createChecklist(name);
-      if (response.statusCode == 200) {
-        print('Create checklist successful');
-        await getAllChecklists();
-      } else {
-        print('Error C Service 3: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error C Service 4: $e');
+  static Future<List<ChecklistModel>> getAllChecklists(String token) async {
+    final response = await http.get(
+      Uri.parse(baseUrl),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body)['data'];
+      return jsonData.map((item) => ChecklistModel.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load todo lists');
     }
   }
 }

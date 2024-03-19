@@ -28,15 +28,18 @@ class RegisterView extends GetView<RegisterController> {
                 height: 20.h,
               ),
               CustomTextField(
+                title: 'Username',
+                hint: 'Username',
+                textEditingController: controller.usernameController,
+              ),
+              SizedBox(
+                height: 20.h,
+              ),
+              CustomTextField(
                 title: 'Password',
                 hint: 'Password',
                 obsecureText: true,
                 textEditingController: controller.passwordController,
-              ),
-              CustomTextField(
-                title: 'Username',
-                hint: 'Username',
-                textEditingController: controller.usernameController,
               ),
               ElevatedButton(
                 onPressed: () async {
