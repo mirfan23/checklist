@@ -44,6 +44,7 @@ class AuthService extends GetxService {
   Future<void> loadToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     token.value = prefs.getString('token') ?? '';
+    print('Loaded token: ${token.value}');
   }
 
   @override

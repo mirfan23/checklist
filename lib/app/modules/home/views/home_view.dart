@@ -15,8 +15,7 @@ class HomeView extends GetView<HomeController> {
         title: Text('Todo List'),
       ),
       body: FutureBuilder<List<ChecklistModel>>(
-        future: ChecklistService.getAllChecklists(
-            controller.authService.token.value),
+        future: loadChecklists(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -49,5 +48,11 @@ class HomeView extends GetView<HomeController> {
         },
       ),
     );
+  }
+
+  Future<List<ChecklistModel>> loadChecklists() async {
+    await controller.authService.loadToken();
+    return ChecklistService.getAllChecklists(
+        controller.authService.token.value);
   }
 }

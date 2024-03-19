@@ -16,8 +16,7 @@ class HomeController extends GetxController {
 
   Future<void> getAllChecklists() async {
     try {
-      await ChecklistService.getAllChecklists(
-          authService.loadToken().toString());
+      await ChecklistService.getAllChecklists(authService.token.value);
     } catch (e) {
       print('Error: $e');
     }

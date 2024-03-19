@@ -1,8 +1,8 @@
 class ChecklistModel {
-  int id;
-  String name;
-  List<TodoItem> items;
-  bool checklistCompletionStatus;
+  final int id;
+  final String name;
+  final List<ItemModel> items;
+  final bool checklistCompletionStatus;
 
   ChecklistModel({
     required this.id,
@@ -12,28 +12,35 @@ class ChecklistModel {
   });
 
   factory ChecklistModel.fromJson(Map<String, dynamic> json) {
+    List<ItemModel> itemsList = [];
+    if (json['items'] != null) {
+      itemsList = (json['items'] as List<dynamic>)
+          .map((item) => ItemModel.fromJson(item))
+          .toList();
+    }
     return ChecklistModel(
       id: json['id'],
       name: json['name'],
-      items: (json['items'] as List)
-          .map((item) => TodoItem.fromJson(item))
-          .toList(),
+      items: itemsList,
       checklistCompletionStatus: json['checklistCompletionStatus'],
     );
   }
 }
 
-class TodoItem {
-  String name;
-  bool completionStatus;
+class ItemModel {
+  final int id;
+  final String name;
+  final bool completionStatus;
 
-  TodoItem({
+  ItemModel({
+    required this.id,
     required this.name,
     required this.completionStatus,
   });
 
-  factory TodoItem.fromJson(Map<String, dynamic> json) {
-    return TodoItem(
+  factory ItemModel.fromJson(Map<String, dynamic> json) {
+    return ItemModel(
+      id: json['id'],
       name: json['name'],
       completionStatus: json['completionStatus'],
     );
